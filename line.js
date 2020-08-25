@@ -57,10 +57,10 @@ const addToLine = (req, res) => {
  */
 const findPosition = (req, res) => {
     const { email } = req.params
-
+    
     try {
         var id = getIdByEmail(email)
-        currentLine.peek() //lança uma exceção caso a fila esteja vazia
+        currentLine.peek()
         res.send({ position: currentLine.getPosition(id) })  
     } catch(e) {
         res.send({ error: e })
