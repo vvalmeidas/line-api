@@ -8,7 +8,7 @@ const EMAIL_REGEX = /\S+@\S+\.\S+/
  * @param {*} gender gender
  * @throws Descrição do(s) campo(s) ausente(s), caso exista(m)
  */
-const validateRegisterFields = (name, email, gender) => {
+const verifyRegisterFields = (name, email, gender) => {
     var errors = []
 
     if(!name || name.trim() === '') errors.push('nome')
@@ -49,7 +49,7 @@ const validateGender = (gender) => {
  * @param {*} gender sigla do gênero
  * @returns nomenclatura adequada para o campo gênero
  */
-const obtainFullGenderName = (gender) => {
+const getFullGenderName = (gender) => {
     gender = gender.toUpperCase()
 
     if(gender === 'F') return 'Feminino'
@@ -59,4 +59,4 @@ const obtainFullGenderName = (gender) => {
 }
 
 
-module.exports = { validateRegisterFields, validateEmail, validateGender, obtainFullGenderName }
+module.exports = { verifyRegisterFields, validateEmail, validateGender, getFullGenderName }

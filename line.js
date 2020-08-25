@@ -15,11 +15,11 @@ const createUser = (req, res) => {
     const { name, email, gender } = req.body
 
     try {
-        utils.validateRegisterFields(name, email, gender)
+        utils.verifyRegisterFields(name, email, gender)
         utils.validateEmail(email)
         utils.validateGender(gender)
         const id = registeredUsers.size;
-        const user = new User(id, name, email, utils.obtainFullGenderName(gender))
+        const user = new User(id, name, email, utils.getFullGenderName(gender))
         registeredUsers.set(id, user)
         res.send(user)    
     } catch(e) {
@@ -61,7 +61,7 @@ const findPosition = (req, res) => {
 
     try {
         if(currentLine.isEmpty()) {
-            res.send({ error: 'A fila está vazia' })
+            res.send({ error: 'A fila está vazia' }) //isso tem q sair
         } else {
             utils.validateEmail(email)
             var id = getIdByEmail(email)
@@ -84,7 +84,7 @@ const getIdByEmail = (email) => {
         console.log(user.email)
         console.log(email)
         console.log(email === user.email)
-        if(email === user.email) {
+        if(user.email === email) {
             foundId = id
         }
     })
@@ -104,16 +104,40 @@ const showLine = (req, res) => {
     var position = 0
 
     var lineWithPositions = currentLine.get().map((id) => {
-        var user = registeredUsers.get(id)
-        console.log({ id, ...user })
+        var { name, email, gender } = registeredUsers.get(id)
         position++
-        return { position, id, ...user }
+        return { position, name, email, gender }
     })
     res.send(lineWithPositions) //VERIFICAR RETORNO COM ARRAY?????
 }
 
+/**
+ * Retorna uma lista contendo todos usuários de um determinado gênero
+ * @param {*} req requisição contendo a sigla do gênero (F, M, NB ou O)
+ * @param {*} res resposta
+ */
 const filterLine = (req, res) => {
+    var filteredUsers = []
+    var requestedGender = req.body.gender
 
+    //NÃO FUNCIONA AINDA!!!!!!!
+
+    if(currentLine.isEmpty()) {
+        res.send({})
+    } else {
+        try {
+            gender = utils.getFullGenderName(gender)
+            currentLine.get().forEach((element, index) => {
+                var { name, email, gender } = registeredUsers.get(element)
+                if(gender === requestedGender) {
+                    filteredUsers.push({ position: index + 1, name, email, gender })
+                }
+            })
+            res.send( filteredUsers )
+        } catch(e) {
+            res.send({ error: e })
+        }
+    }
 }
 
 /**
