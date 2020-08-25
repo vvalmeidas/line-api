@@ -17,7 +17,6 @@ const createUser = (req, res) => {
     try {
         utils.verifyRegisterFields(name, email, gender)
         utils.validateEmail(email)
-        utils.validateGender(gender)
         const id = registeredUsers.size;
         const user = new User(id, name, email, utils.getFullGenderName(gender))
         registeredUsers.set(id, user)
@@ -60,13 +59,9 @@ const findPosition = (req, res) => {
     const { email } = req.body
 
     try {
-        if(currentLine.isEmpty()) {
-            res.send({ error: 'A fila está vazia' }) //isso tem q sair
-        } else {
-            utils.validateEmail(email)
-            var id = getIdByEmail(email)
-            res.send({ position: currentLine.getPosition(id) })  
-        }
+        currentLine.peek()
+        var id = getIdByEmail(email)
+        res.send({ position: currentLine.getPosition(id) })  
     } catch(e) {
         res.send({ error: e })
     }
@@ -78,20 +73,15 @@ const findPosition = (req, res) => {
  * @throws Descrição do erro, informando que não existe cadastro associado ao email informado
  */
 const getIdByEmail = (email) => {
-    var foundId = null
+    utils.validateEmail(email)
 
-    registeredUsers.forEach((user, id) => {
-        console.log(user.email)
-        console.log(email)
+    for(const [id, user] of registeredUsers.entries()) {
         console.log(email === user.email)
         if(user.email === email) {
-            foundId = id
+            return id
         }
-    })
+    }
 
-    //XXXXXXXXXXXXXXXXXXXX VERIFICAR MELHOR, FAZER MAIS TESTES
-
-    if(foundId) return foundId
     throw 'Não existe cadastro associado ao e-mail informado'
 }
 
@@ -120,23 +110,18 @@ const filterLine = (req, res) => {
     var filteredUsers = []
     var requestedGender = req.body.gender
 
-    //NÃO FUNCIONA AINDA!!!!!!!
-
-    if(currentLine.isEmpty()) {
-        res.send({})
-    } else {
-        try {
-            gender = utils.getFullGenderName(gender)
-            currentLine.get().forEach((element, index) => {
-                var { name, email, gender } = registeredUsers.get(element)
-                if(gender === requestedGender) {
-                    filteredUsers.push({ position: index + 1, name, email, gender })
-                }
-            })
-            res.send( filteredUsers )
-        } catch(e) {
-            res.send({ error: e })
-        }
+    try {
+        currentLine.peek()
+        requestedGender = utils.getFullGenderName(requestedGender)
+        currentLine.get().forEach((id, index) => {
+            var { name, email, gender } = registeredUsers.get(id)
+            if(gender === requestedGender) {
+                filteredUsers.push({ position: index + 1, name, email, gender })
+            }
+        })
+        res.send( filteredUsers )
+    } catch(e) {
+        res.send({ error: e })
     }
 }
 

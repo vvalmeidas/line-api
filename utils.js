@@ -6,7 +6,7 @@ const EMAIL_REGEX = /\S+@\S+\.\S+/
  * @param {*} name nome
  * @param {*} email email
  * @param {*} gender gender
- * @throws Descrição do(s) campo(s) ausente(s), caso exista(m)
+ * @throws Erro informando o(s) campo(s) ausente(s), caso exista(m)
  */
 const verifyRegisterFields = (name, email, gender) => {
     var errors = []
@@ -23,7 +23,7 @@ const verifyRegisterFields = (name, email, gender) => {
 /**
  * Realiza validação do e-mail, verificando se ele existe e se possui formato válido
  * @param {*} email email a ser validado
- * @throws Descrição do erro, podendo indicar que o e-mail não foi informado ou que é inválido
+ * @throws Erro indicando que o e-mail não foi informado ou que é inválido
  */
 const validateEmail = (email) => {
     if(!email) throw 'E-mail não foi informado'
@@ -31,32 +31,20 @@ const validateEmail = (email) => {
 }
 
 /**
- * Realiza validação do gênero, verificando se o campo possui valor F (Feminino), M (Masculino), 
- * NB (Não-binário) ou O (Outros)
- * @param {*} gender sigla para o campo gênero
- * @throws Descrição do erro, indicando que o campo gênero possui formato inválido
- */
-const validateGender = (gender) => {
-    gender = gender.toUpperCase()
-    if(!gender) throw 'Gênero não foi informado'
-    else if(gender != 'F' && gender != 'M' && gender != 'NB' && gender != 'O') 
-        throw 'O campo gênero possui formato inválido. Informe F (Feminino), M (Masculino), NB (Não-binário) ou O (Outros).'
-
-}
-
-/**
- * Obtém a nomenclatura completa para o campo gênero, que é informado por sigla no cadastro
+ * Obtém a nomenclatura completa para o campo gênero, que é informado por sigla no cadastro. A conversão ocorre
+ * de modo que F = Feminino, M = Masculino, NB = Não-binário ou O = Outros.
  * @param {*} gender sigla do gênero
  * @returns nomenclatura adequada para o campo gênero
+ * @throws Erro indicando que o campo gênero é indefinido ou possui formato inválido
  */
 const getFullGenderName = (gender) => {
+    if(!gender) throw 'Gênero não foi informado'
     gender = gender.toUpperCase()
-
     if(gender === 'F') return 'Feminino'
     else if(gender === 'M') return 'Masculino'
     else if (gender === 'NB') return 'Não-binário'
-    else return 'Outros'
+    else if (gender === 'O') return 'Outros'
+    else throw 'O campo gênero possui formato inválido. Informe F (Feminino), M (Masculino), NB (Não-binário) ou O (Outros).'
 }
 
-
-module.exports = { verifyRegisterFields, validateEmail, validateGender, getFullGenderName }
+module.exports = { verifyRegisterFields, validateEmail, getFullGenderName }

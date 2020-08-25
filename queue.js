@@ -31,12 +31,22 @@ module.exports = class Queue {
 
     /**
      * Remove o primeiro elemento da fila
-     * @returns primeiro elemento da fila
-     * @throws Indicação de que a fila está vazia
+     * @returns primeiro elemento da fila, caso exista
+     * @throws Erro indicando que a fila está vazia
      */
     pop() {
         if(this.isEmpty()) throw 'A fila está vazia'
         return this.elements.shift()
+    }
+
+    /**
+     * Informa o primeiro elemento da fila, sem removê-lo
+     * @returns primeiro elemento da fila, caso exista
+     * @throws Erro indicando que a fila está vazia
+     */
+    peek() {
+        if(this.isEmpty()) throw 'A fila está vazia'
+        return this.elements[0]
     }
 
     /**
