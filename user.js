@@ -1,3 +1,6 @@
+/**
+ * Classe que representa um usuário que será inserido na fila
+ */
 module.exports = class User {
     /**
      * Cria uma nova instância da classe usuário

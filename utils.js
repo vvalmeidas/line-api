@@ -1,5 +1,7 @@
+/**
+ * Esse arquivo contém funções utilizadas no gerenciamento da fila de pessoas
+ */
 const EMAIL_REGEX = /\S+@\S+\.\S+/
-
 
 /**
  * Verifica se há algum campo ausente para o cadastro de usuário

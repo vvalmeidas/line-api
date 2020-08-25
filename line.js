@@ -56,11 +56,11 @@ const addToLine = (req, res) => {
  * @param {*} res resposta
  */
 const findPosition = (req, res) => {
-    const { email } = req.body
+    const { email } = req.params
 
     try {
-        currentLine.peek()
         var id = getIdByEmail(email)
+        currentLine.peek() //lança uma exceção caso a fila esteja vazia
         res.send({ position: currentLine.getPosition(id) })  
     } catch(e) {
         res.send({ error: e })
@@ -76,7 +76,6 @@ const getIdByEmail = (email) => {
     utils.validateEmail(email)
 
     for(const [id, user] of registeredUsers.entries()) {
-        console.log(email === user.email)
         if(user.email === email) {
             return id
         }
@@ -92,13 +91,12 @@ const getIdByEmail = (email) => {
  */
 const showLine = (req, res) => {
     var position = 0
-
     var lineWithPositions = currentLine.get().map((id) => {
         var { name, email, gender } = registeredUsers.get(id)
         position++
         return { position, name, email, gender }
     })
-    res.send(lineWithPositions) //VERIFICAR RETORNO COM ARRAY?????
+    res.send(lineWithPositions)
 }
 
 /**
@@ -108,18 +106,18 @@ const showLine = (req, res) => {
  */
 const filterLine = (req, res) => {
     var filteredUsers = []
-    var requestedGender = req.body.gender
+    var requestedGender = req.params.gender
 
     try {
-        currentLine.peek()
         requestedGender = utils.getFullGenderName(requestedGender)
+        currentLine.peek() //lança uma exceção caso a fila esteja vazia
         currentLine.get().forEach((id, index) => {
             var { name, email, gender } = registeredUsers.get(id)
             if(gender === requestedGender) {
                 filteredUsers.push({ position: index + 1, name, email, gender })
             }
         })
-        res.send( filteredUsers )
+        res.send(filteredUsers)
     } catch(e) {
         res.send({ error: e })
     }

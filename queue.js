@@ -1,3 +1,6 @@
+/**
+ * Classe que represeta a estrutura de dados fila (FIFO).
+ */
 module.exports = class Queue {
     constructor() {
         this.elements = []
