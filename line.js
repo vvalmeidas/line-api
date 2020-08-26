@@ -7,6 +7,23 @@ var currentLine = new Queue()
 const utils = require('./utils')
 
 /**
+ * Obtém o ID de um usuário por meio do seu emaiil
+ * @param {*} email email do usuário
+ * @throws Descrição do erro, informando que não existe cadastro associado ao email informado
+ */
+const getIdByEmail = (email) => {
+    utils.validateEmail(email)
+
+    for(const [id, user] of registeredUsers.entries()) {
+        if(user.email === email) {
+            return id
+        }
+    }
+
+    throw 'Não existe cadastro associado ao e-mail informado'
+}
+
+/**
  * Realiza o cadastro de um usuário
  * @param {*} req requisição contendo os dados do novo usuário
  * @param {*} res resposta
@@ -67,22 +84,6 @@ const findPosition = (req, res) => {
     }
 }
 
-/**
- * Obtém o ID de um usuário por meio do seu emaiil
- * @param {*} email email do usuário
- * @throws Descrição do erro, informando que não existe cadastro associado ao email informado
- */
-const getIdByEmail = (email) => {
-    utils.validateEmail(email)
-
-    for(const [id, user] of registeredUsers.entries()) {
-        if(user.email === email) {
-            return id
-        }
-    }
-
-    throw 'Não existe cadastro associado ao e-mail informado'
-}
 
 /**
  * Realiza a listagem de todos os usuários da fila com as suas posições

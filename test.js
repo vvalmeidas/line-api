@@ -7,26 +7,56 @@ const SERVER = 'http://localhost:3000'
 
 chai.use(chaiHttp)
 
-const USER_VALID_MARIA = {'name': 'Maria', 'email': 'maria@email.com','gender': 'F'}
-const USER_VALID_JOAO = {'name': 'Joao', 'email': 'joao@email.com','gender': 'M'}
-const USER_VALID_ARI = {'name': 'Ari', 'email': 'ari@email.com', 'gender': 'NB'}
+var userValidMaria = {'name': 'Maria', 'email': Math.random().toString(36).substring(8) + '@email.com','gender': 'F'}
+var userValidCarla = {'name': 'Carla', 'email': Math.random().toString(36).substring(8) + '@email.com','gender': 'F'}
+var userValidAri = {'name': 'Ari', 'email': Math.random().toString(36).substring(8) + '@email.com', 'gender': 'F'}
 
-var registersCount = 0
-var lineSize = 0
 
 describe('Cadastro de usuário (createUser)', () => {
-    it('Cadastro com sucesso', (done) => {
+    it('Cadastro com sucesso: usuária Maria', (done) => {
         chai.request(SERVER)
         .post('/createUser')
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(USER_VALID_MARIA)
+        .send(userValidMaria)
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('error')
             res.body.should.be.a('object').that.have.property('id')
-            res.body.should.be.a('object').that.have.property('name').equal('Maria')
-            res.body.should.be.a('object').that.have.property('email').equal('maria@email.com')
+            res.body.should.be.a('object').that.have.property('name').equal(userValidMaria.name)
+            res.body.should.be.a('object').that.have.property('email').equal(userValidMaria.email)
             res.body.should.be.a('object').that.have.property('gender').equal('Feminino')
-            registersCount++;
+            userValidMaria.id = res.body.id
+            done()
+        })
+    })
+
+    it('Cadastro com sucesso: usuária Carla', (done) => {
+        chai.request(SERVER)
+        .post('/createUser')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(userValidCarla)
+        .end((err, res) => {
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('id')
+            res.body.should.be.a('object').that.have.property('name').equal(userValidCarla.name)
+            res.body.should.be.a('object').that.have.property('email').equal(userValidCarla.email)
+            res.body.should.be.a('object').that.have.property('gender').equal('Feminino')
+            userValidCarla.id = res.body.id
+            done()
+        })
+    })
+
+    it('Cadastro com sucesso: usuária Ari', (done) => {
+        chai.request(SERVER)
+        .post('/createUser')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(userValidAri)
+        .end((err, res) => {
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('id')
+            res.body.should.be.a('object').that.have.property('name').equal(userValidAri.name)
+            res.body.should.be.a('object').that.have.property('email').equal(userValidAri.email)
+            res.body.should.be.a('object').that.have.property('gender').equal('Feminino')
+            userValidAri.id = res.body.id
             done()
         })
     })
@@ -50,7 +80,7 @@ describe('Cadastro de usuário (createUser)', () => {
         chai.request(SERVER)
         .post('/createUser')
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send({'name': 'Maria', 'email': 'maria@email', 'gender': 'F'})
+        .send({...userValidMaria, 'email': 'maria@email'})
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('id')
             res.body.should.be.a('object').that.not.have.property('name')
@@ -65,7 +95,7 @@ describe('Cadastro de usuário (createUser)', () => {
         chai.request(SERVER)
         .post('/createUser')
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send({'name': 'Maria', 'email': 'maria@email.com', 'gender': 'g'})
+        .send({...userValidMaria, 'gender': 'g'})
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('id')
             res.body.should.be.a('object').that.not.have.property('name')
@@ -77,35 +107,28 @@ describe('Cadastro de usuário (createUser)', () => {
     })
 })
 
-const generateNewUser = (data) => {
-    return new Promise((resolve, reject) => {
+describe('Adicionar usuário na fila (addToLine)', () => {
+    it('Adicionando usuária Maria na primeira posição com sucesso', (done) => {
         chai.request(SERVER)
-        .post('/createUser')
+        .post('/addToLine')
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(data)
+        .send({'id': userValidMaria.id})
         .end((err, res) => {
-            resolve(res.body.id)
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('position').equal(1)
+            done()
         })
     })
-}
 
-describe('Adicionar usuário na fila (addToLine)', () => {
-    var id;
-
-    it('Adicionando na fila com sucesso', (done) => {
-        var idValue
-        generateNewUser(USER_VALID_JOAO)
-        .then(value => {
-            id = value
-            chai.request(SERVER)
-            .post('/addToLine')
-            .set('content-type', 'application/x-www-form-urlencoded')
-            .send({'id': id})
-            .end((err, res) => {
-                res.body.should.be.a('object').that.not.have.property('error')
-                res.body.should.be.a('object').that.have.property('position')
-                done()
-            })
+    it('Adicionando usuária Carla na segunda posição com sucesso', (done) => {
+        chai.request(SERVER)
+        .post('/addToLine')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({'id': userValidCarla.id})
+        .end((err, res) => {
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('position').equal(2)
+            done()
         })
     }) 
 
@@ -113,7 +136,7 @@ describe('Adicionar usuário na fila (addToLine)', () => {
         chai.request(SERVER)
         .post('/addToLine')
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send({'id': id})
+        .send({'id': userValidCarla.id})
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('position')
             res.body.should.be.a('object').that.have.property('error').equal('O usuário já foi inserido na fila anteriormente')
@@ -146,10 +169,31 @@ describe('Adicionar usuário na fila (addToLine)', () => {
 
 })
 
-describe('Encontrar posição do usuário na fila (findPosição)', () => {
-    it('Encontrando posição de usuário com sucesso', (done) => {
+describe('Exibir a fila completa e ordenada (showLine)', () => {
+    it('Exibindo a fila com sucesso', (done) => {
         chai.request(SERVER)
-        .get(`/findPosition/${USER_VALID_JOAO.email}`)
+        .get('/showLine')
+        .end((err, res) => {
+            res.body.should.be.a('array')
+            const firstUser = res.body[0]
+            const secondUser = res.body[1]
+            firstUser.should.be.a('object').that.have.property('position').equal(1)
+            firstUser.should.be.a('object').that.have.property('name').equal(userValidMaria.name)
+            firstUser.should.be.a('object').that.have.property('email').equal(userValidMaria.email)
+            firstUser.should.be.a('object').that.have.property('gender').equal('Feminino')
+            secondUser.should.be.a('object').that.have.property('position').equal(2)
+            secondUser.should.be.a('object').that.have.property('name').equal(userValidCarla.name)
+            secondUser.should.be.a('object').that.have.property('email').equal(userValidCarla.email)
+            secondUser.should.be.a('object').that.have.property('gender').equal('Feminino')
+            done()
+        })
+    })
+})
+
+describe('Encontrar posição do usuário na fila (findPosition)', () => {
+    it('Encontrando posição da usuária Maria com sucesso', (done) => {
+        chai.request(SERVER)
+        .get(`/findPosition/${userValidMaria.email}`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('error')
@@ -158,9 +202,20 @@ describe('Encontrar posição do usuário na fila (findPosição)', () => {
         })
     })
 
-    it('Falha ao encontrar posição: email não encontrado na fila', (done) => {
+    it('Encontrando posição da usuária Carla com sucesso', (done) => {
         chai.request(SERVER)
-        .get(`/findPosition/${USER_VALID_MARIA.email}`)
+        .get(`/findPosition/${userValidCarla.email}`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .end((err, res) => {
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('position').equal(2)
+            done()
+        })
+    })
+
+    it('Buscando um email que não está na fila', (done) => {
+        chai.request(SERVER)
+        .get(`/findPosition/${userValidAri.email}`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('error')
@@ -182,7 +237,7 @@ describe('Encontrar posição do usuário na fila (findPosição)', () => {
 
     it('Falha ao encontrar posição: email com formato inválido', (done) => {
         chai.request(SERVER)
-        .get(`/findPosition/joao@email`)
+        .get(`/findPosition/carla@email`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .end((err, res) => {
             res.body.should.be.a('object').that.not.have.property('position')
@@ -192,16 +247,79 @@ describe('Encontrar posição do usuário na fila (findPosição)', () => {
     })
 })
 
-describe('Exibir a fila completa e ordenada (showLine)', () => {
-    it('Exibindo a fila com sucesso', (done) => {
+
+describe('Filtrar a fila por gênero (filterLine)', () => {
+    it('Filtrando por gênero com sucesso', (done) => {
         chai.request(SERVER)
-        .get('/showLine')
+        .get(`/filterLine/f`)
+        .set('content-type', 'application/x-www-form-urlencoded')
         .end((err, res) => {
-            const result = res.body[0]
-            result.should.be.a('object').that.have.property('position').equal(1)
-            result.should.be.a('object').that.have.property('name').equal(USER_VALID_JOAO.name)
-            result.should.be.a('object').that.have.property('email').equal(USER_VALID_JOAO.email)
-            result.should.be.a('object').that.have.property('gender').equal('Masculino')
+            res.body.should.be.a('array')
+            const userCarla = res.body[0], userAri = res.body[1]
+            userCarla.should.be.a('object').that.have.property('position').equal(1)
+            userCarla.should.be.a('object').that.have.property('name').equal(userValidMaria.name)
+            userCarla.should.be.a('object').that.have.property('email').equal(userValidMaria.email)
+            userCarla.should.be.a('object').that.have.property('gender').equal('Feminino')
+            userAri.should.be.a('object').that.have.property('position').equal(2)
+            userAri.should.be.a('object').that.have.property('name').equal(userValidCarla.name)
+            userAri.should.be.a('object').that.have.property('email').equal(userValidCarla.email)
+            userAri.should.be.a('object').that.have.property('gender').equal('Feminino')
+            done()
+        })
+    })
+
+    it('Falha ao filtrar: gênero inválido', (done) => {
+        chai.request(SERVER)
+        .get(`/filterLine/invalido`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .end((err, res) => {
+            res.body.should.be.a('object').that.have.property('error').equal('O campo gênero possui formato inválido. Informe F (Feminino), M (Masculino), NB (Não-binário) ou O (Outros).')
+            done()
+        })
+    })
+
+})
+
+describe('Remover da primeira posição da fila e retornar (popLine)', () => {
+    it('Removendo a usuária que foi inserida primeiro (Maria) com sucesso', (done) => {
+        chai.request(SERVER)
+        .post('/popLine')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({'id': userValidMaria.id})
+        .end((err, res) => {
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('id').equal(userValidMaria.id)
+            res.body.should.be.a('object').that.have.property('name').equal(userValidMaria.name)
+            res.body.should.be.a('object').that.have.property('email').equal(userValidMaria.email)
+            res.body.should.be.a('object').that.have.property('gender').equal('Feminino')
+            userValidMaria.id = res.body.id
+            done()
+        })
+    })
+
+    it('Removendo a usuária que foi inserida depois (Carla) com sucesso', (done) => {
+        chai.request(SERVER)
+        .post('/popLine')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({'id': userValidMaria.id})
+        .end((err, res) => {
+            res.body.should.be.a('object').that.not.have.property('error')
+            res.body.should.be.a('object').that.have.property('id').equal(userValidCarla.id)
+            res.body.should.be.a('object').that.have.property('name').equal(userValidCarla.name)
+            res.body.should.be.a('object').that.have.property('email').equal(userValidCarla.email)
+            res.body.should.be.a('object').that.have.property('gender').equal('Feminino')
+            userValidMaria.id = res.body.id
+            done()
+        })
+    })
+
+    it('Falha ao remover da fila: fila vazia', (done) => {
+        chai.request(SERVER)
+        .post('/popLine')
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({'id': userValidMaria.id})
+        .end((err, res) => {
+            res.body.should.be.a('object').that.have.property('error').equal('A fila está vazia')
             done()
         })
     })
