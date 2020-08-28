@@ -1,6 +1,5 @@
 # API para gerenciamento de filas
 
-##Execução:##
-
-npm start - inicia o servidor e a aplicação
-npm test - executa os testes de unidade
+Execução:<br>
+<b>npm start:</b> inicia o servidor e a aplicação<br>
+<b>npm test:</b> - executa os testes de unidade
